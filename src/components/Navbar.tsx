@@ -31,8 +31,8 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" size="sm">Se connecter</Button>
-          <Button variant="default" size="sm">S'inscrire</Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>Se connecter</Button>
+          <Button variant="default" size="sm" onClick={() => navigate("/register")}>S'inscrire</Button>
         </div>
 
         {/* Mobile toggle */}
