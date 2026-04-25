@@ -1,4 +1,4 @@
-import { allJobs } from "./Jobs";
+import { allJobs } from "@/pages/Jobs";
 
 export interface Company {
   id: string;
