@@ -8,6 +8,8 @@ import NotFound from "./pages/NotFound.tsx";
 import Login from "./pages/Login.tsx";
 import Jobs from "./pages/Jobs.tsx";
 import JobDetail from "./pages/JobDetail.tsx";
+import Companies from "./pages/Companies.tsx";
+import CompanyDetail from "./pages/CompanyDetail.tsx";
 import Register from "./pages/Register.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import AdminUsers from "./pages/admin/AdminUsers.tsx";
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
+          <Route path="/companies" element={<Companies />} />
+          <Route path="/companies/:id" element={<CompanyDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 

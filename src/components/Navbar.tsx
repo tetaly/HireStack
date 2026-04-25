@@ -22,9 +22,9 @@ const Navbar = () => {
           <button onClick={() => navigate("/jobs")} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
             Offres d'emploi
           </button>
-          <a href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+          <button onClick={() => navigate("/companies")} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
             Entreprises
-          </a>
+          </button>
           <a href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
             Conseils carrière
           </a>
