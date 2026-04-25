@@ -19,9 +19,9 @@ const Navbar = () => {
 
         {/* Desktop */}
         <div className="hidden items-center gap-6 md:flex">
-          <a href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+          <button onClick={() => navigate("/jobs")} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
             Offres d'emploi
-          </a>
+          </button>
           <a href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
             Entreprises
           </a>
