@@ -4,11 +4,51 @@ import { Briefcase, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { apiRequest, authStorage, nextPathForUser } from "@/lib/api";
 
 const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("seeker");
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    companyName: "",
+    password: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const updateField = (field) => (event) => {
+    setForm((current) => ({
+      ...current,
+      [field]: event.target.value,
+    }));
+  };
+
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const data = await apiRequest("/auth/register", {
+        method: "POST",
+        body: JSON.stringify({
+          ...form,
+          role,
+        }),
+      });
+
+      authStorage.setSession(data);
+      toast.success("Compte cree avec succes");
+      navigate(nextPathForUser(data.user));
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const roles = [
     {
@@ -73,15 +113,23 @@ const Register = () => {
             ))}
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleRegister}>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label>Prénom</Label>
-                <Input placeholder="Jean" />
+                <Input
+                  placeholder="Jean"
+                  value={form.firstName}
+                  onChange={updateField("firstName")}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Nom</Label>
-                <Input placeholder="Dupont" />
+                <Input
+                  placeholder="Dupont"
+                  value={form.lastName}
+                  onChange={updateField("lastName")}
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -92,13 +140,19 @@ const Register = () => {
                   type="email"
                   placeholder="votre@email.com"
                   className="pl-10"
+                  value={form.email}
+                  onChange={updateField("email")}
                 />
               </div>
             </div>
             {role === "recruiter" && (
               <div className="space-y-2">
                 <Label>Entreprise</Label>
-                <Input placeholder="Nom de votre entreprise" />
+                <Input
+                  placeholder="Nom de votre entreprise"
+                  value={form.companyName}
+                  onChange={updateField("companyName")}
+                />
               </div>
             )}
             <div className="space-y-2">
@@ -109,6 +163,8 @@ const Register = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="pl-10 pr-10"
+                  value={form.password}
+                  onChange={updateField("password")}
                 />
                 <button
                   type="button"
@@ -124,7 +180,7 @@ const Register = () => {
               </div>
             </div>
             <Button variant="hero" className="w-full" size="lg">
-              Créer mon compte
+              {isSubmitting ? "Creation..." : "Créer mon compte"}
             </Button>
           </form>
 

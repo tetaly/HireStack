@@ -4,12 +4,35 @@ import { Briefcase, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { apiRequest, authStorage, nextPathForUser } from "@/lib/api";
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const data = await apiRequest("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+
+      authStorage.setSession(data);
+      toast.success("Connexion reussie");
+      navigate(nextPathForUser(data.user));
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleDemoLogin = (role) => {
     const routes = {
@@ -57,7 +80,7 @@ const Login = () => {
             Entrez vos identifiants pour accéder à votre espace
           </p>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -107,7 +130,7 @@ const Login = () => {
               </a>
             </div>
             <Button variant="hero" className="w-full" size="lg">
-              Se connecter
+              {isSubmitting ? "Connexion..." : "Se connecter"}
             </Button>
           </form>
 

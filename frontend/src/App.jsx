@@ -23,6 +23,9 @@ import SeekerSearch from "./pages/seeker/SeekerSearch.jsx";
 import SeekerApplications from "./pages/seeker/SeekerApplications.jsx";
 import SeekerProfile from "./pages/seeker/SeekerProfile.jsx";
 import SeekerAlerts from "./pages/seeker/SeekerAlerts.jsx";
+import SeekerOnboarding from "./pages/seeker/SeekerOnboarding.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PublicOnlyRoute from "./components/PublicOnlyRoute.jsx";
 
 const queryClient = new QueryClient();
 
@@ -38,29 +41,132 @@ const App = () => (
           <Route path="/jobs/:id" element={<JobDetail />} />
           <Route path="/companies" element={<Companies />} />
           <Route path="/companies/:id" element={<CompanyDetail />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/login"
+            element={
+              <PublicOnlyRoute>
+                <Login />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicOnlyRoute>
+                <Register />
+              </PublicOnlyRoute>
+            }
+          />
 
           {/* Admin */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/listings" element={<AdminListings />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/listings"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminListings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminSettings />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Recruiter */}
-          <Route path="/recruiter" element={<RecruiterDashboard />} />
-          <Route path="/recruiter/listings" element={<RecruiterListings />} />
-          <Route path="/recruiter/post" element={<RecruiterPostJob />} />
+          <Route
+            path="/recruiter"
+            element={
+              <ProtectedRoute roles={["recruiter"]}>
+                <RecruiterDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recruiter/listings"
+            element={
+              <ProtectedRoute roles={["recruiter"]}>
+                <RecruiterListings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recruiter/post"
+            element={
+              <ProtectedRoute roles={["recruiter"]}>
+                <RecruiterPostJob />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/recruiter/candidates"
-            element={<RecruiterCandidates />}
+            element={
+              <ProtectedRoute roles={["recruiter"]}>
+                <RecruiterCandidates />
+              </ProtectedRoute>
+            }
           />
 
           {/* Seeker */}
-          <Route path="/seeker" element={<SeekerSearch />} />
-          <Route path="/seeker/applications" element={<SeekerApplications />} />
-          <Route path="/seeker/profile" element={<SeekerProfile />} />
-          <Route path="/seeker/alerts" element={<SeekerAlerts />} />
+          <Route
+            path="/seeker/onboarding"
+            element={
+              <ProtectedRoute roles={["seeker"]}>
+                <SeekerOnboarding />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/seeker"
+            element={
+              <ProtectedRoute roles={["seeker"]}>
+                <SeekerSearch />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/seeker/applications"
+            element={
+              <ProtectedRoute roles={["seeker"]}>
+                <SeekerApplications />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/seeker/profile"
+            element={
+              <ProtectedRoute roles={["seeker"]}>
+                <SeekerProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/seeker/alerts"
+            element={
+              <ProtectedRoute roles={["seeker"]}>
+                <SeekerAlerts />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

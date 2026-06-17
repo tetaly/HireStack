@@ -12,6 +12,7 @@ import {
   Bell,
   ChevronLeft,
 } from "lucide-react";
+import { authApi, authStorage } from "@/lib/api";
 
 const navItems = {
   admin: [
@@ -49,6 +50,20 @@ const DashboardLayout = ({ children, role, title }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const items = navItems[role];
+  const user = authStorage.getUser();
+  const userName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Utilisateur";
+
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+    } catch {
+      // The local session should be cleared even if the API is unreachable.
+    } finally {
+      authStorage.clearSession();
+      navigate("/login", { replace: true });
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -91,6 +106,14 @@ const DashboardLayout = ({ children, role, title }) => {
         </nav>
 
         <div className="border-t border-border p-3 space-y-1">
+          <div className="mb-2 rounded-lg bg-secondary px-3 py-2">
+            <div className="truncate text-xs font-medium text-foreground">
+              {userName}
+            </div>
+            <div className="truncate text-[11px] text-muted-foreground">
+              {user?.email}
+            </div>
+          </div>
           <button
             onClick={() => navigate("/")}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -99,7 +122,7 @@ const DashboardLayout = ({ children, role, title }) => {
             Accueil
           </button>
           <button
-            onClick={() => navigate("/login")}
+            onClick={handleLogout}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
           >
             <LogOut className="h-4 w-4" />
