@@ -160,7 +160,7 @@ const CompanyDetail = () => {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {jobs.map((job) => (
-              <Link key={job.id} to={`/jobs/${job.id}`}>
+              <Link key={job.id} to={`/jobs/${job.id}`} className="h-full">
                 <JobCard {...job} />
               </Link>
             ))}

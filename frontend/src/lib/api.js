@@ -93,3 +93,34 @@ export const seekerProfileApi = {
     });
   },
 };
+
+export const jobsApi = {
+  list(params = {}) {
+    const search = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        search.set(key, value);
+      }
+    });
+
+    const query = search.toString();
+
+    return apiRequest(`/jobs${query ? `?${query}` : ""}`);
+  },
+  get(id) {
+    return apiRequest(`/jobs/${id}`);
+  },
+};
+
+export const recruiterJobsApi = {
+  list() {
+    return apiRequest("/recruiter/jobs");
+  },
+  create(payload) {
+    return apiRequest("/recruiter/jobs", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+};

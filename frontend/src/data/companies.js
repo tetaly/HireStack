@@ -1,5 +1,3 @@
-import { allJobs } from "@/pages/Jobs";
-
 export const companies = [
   {
     id: "techvision",
@@ -110,5 +108,4 @@ export const companies = [
   },
 ];
 
-export const getJobsByCompany = (companyName) =>
-  allJobs.filter((j) => j.company.toLowerCase() === companyName.toLowerCase());
+export const getJobsByCompany = () => [];
