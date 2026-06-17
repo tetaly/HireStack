@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import FooterSection from "@/components/FooterSection";
@@ -14,13 +15,55 @@ import {
   Bookmark,
   CheckCircle2,
 } from "lucide-react";
-import { allJobs } from "./Jobs";
 import { toast } from "sonner";
+import { jobsApi } from "@/lib/api";
 
 const JobDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const job = allJobs.find((j) => j.id === id);
+  const [job, setJob] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    setLoading(true);
+    jobsApi
+      .get(id)
+      .then((data) => {
+        if (active) {
+          setJob(data.job);
+          setRelated(data.related ?? []);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setJob(null);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-24 text-center text-muted-foreground">
+          Chargement de l'offre...
+        </div>
+        <FooterSection />
+      </div>
+    );
+  }
 
   if (!job) {
     return (
@@ -42,10 +85,6 @@ const JobDetail = () => {
       </div>
     );
   }
-
-  const related = allJobs
-    .filter((j) => j.id !== job.id && j.category === job.category)
-    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,44 +145,27 @@ const JobDetail = () => {
                 Description du poste
               </h2>
               <p className="mt-3 text-muted-foreground leading-relaxed">
-                Rejoignez {job.company} en tant que {job.title}. Vous
-                travaillerez au sein d'une équipe passionnée sur des projets
-                ambitieux à fort impact. Nous recherchons une personne motivée,
-                autonome et souhaitant évoluer dans un environnement stimulant.
+                {job.description}
               </p>
 
               <h3 className="mt-6 font-heading text-base font-semibold text-foreground">
                 Vos missions
               </h3>
               <ul className="mt-3 space-y-2 text-muted-foreground">
-                {[
-                  "Concevoir et développer de nouvelles fonctionnalités",
-                  "Collaborer avec les équipes produit et design",
-                  "Garantir la qualité du code et participer aux revues",
-                  "Contribuer à l'amélioration continue de l'architecture",
-                ].map((m) => (
-                  <li key={m} className="flex items-start gap-2">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{" "}
-                    {m}
-                  </li>
-                ))}
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{" "}
+                  {job.description}
+                </li>
               </ul>
 
               <h3 className="mt-6 font-heading text-base font-semibold text-foreground">
                 Profil recherché
               </h3>
               <ul className="mt-3 space-y-2 text-muted-foreground">
-                {[
-                  "3+ ans d'expérience sur un poste similaire",
-                  "Maîtrise des technologies listées",
-                  "Excellente communication et esprit d'équipe",
-                  "Goût pour la résolution de problèmes complexes",
-                ].map((m) => (
-                  <li key={m} className="flex items-start gap-2">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{" "}
-                    {m}
-                  </li>
-                ))}
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{" "}
+                  {job.profileRequired || "Profil motive, autonome et organise."}
+                </li>
               </ul>
 
               <h3 className="mt-6 font-heading text-base font-semibold text-foreground">

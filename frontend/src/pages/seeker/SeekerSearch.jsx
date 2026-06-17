@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,83 +18,63 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const jobs = [
-  {
-    title: "Développeur Full Stack",
-    company: "TechVision",
-    location: "Paris",
-    type: "CDI",
-    salary: "55-70k €",
-    tags: ["React", "Node.js"],
-    posted: "Il y a 2h",
-    saved: false,
-  },
-  {
-    title: "Product Designer Senior",
-    company: "DesignLab",
-    location: "Lyon · Hybride",
-    type: "CDI",
-    salary: "50-62k €",
-    tags: ["Figma", "UX"],
-    posted: "Il y a 5h",
-    saved: true,
-  },
-  {
-    title: "Data Analyst",
-    company: "DataCore",
-    location: "Télétravail",
-    type: "CDI",
-    salary: "45-55k €",
-    tags: ["SQL", "Python"],
-    posted: "Il y a 8h",
-    saved: false,
-  },
-  {
-    title: "Responsable Marketing",
-    company: "GrowthUp",
-    location: "Bordeaux",
-    type: "CDI",
-    salary: "48-58k €",
-    tags: ["SEO", "Growth"],
-    posted: "Il y a 1j",
-    saved: false,
-  },
-  {
-    title: "Ingénieur DevOps",
-    company: "CloudNine",
-    location: "Nantes · Hybride",
-    type: "CDI",
-    salary: "52-65k €",
-    tags: ["AWS", "Docker"],
-    posted: "Il y a 1j",
-    saved: true,
-  },
-  {
-    title: "Chef de Projet Digital",
-    company: "AgencyX",
-    location: "Paris",
-    type: "CDD",
-    salary: "42-50k €",
-    tags: ["Agile", "Scrum"],
-    posted: "Il y a 2j",
-    saved: false,
-  },
-];
+import { jobsApi } from "@/lib/api";
 
 const SeekerSearch = () => {
+  const [query, setQuery] = useState("");
+  const [location, setLocation] = useState("");
+  const [type, setType] = useState("all");
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    setLoading(true);
+    jobsApi
+      .list({
+        q: query,
+        location,
+        type: type === "all" ? "" : type,
+      })
+      .then((data) => {
+        if (active) {
+          setJobs(data.jobs);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [query, location, type]);
+
   return (
     <DashboardLayout role="seeker" title="Rechercher un emploi">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Titre, mot-clé..." className="pl-10" />
+          <Input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Titre, mot-clé..."
+            className="pl-10"
+          />
         </div>
         <div className="relative flex-1">
           <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Ville..." className="pl-10" />
+          <Input
+            value={location}
+            onChange={(event) => setLocation(event.target.value)}
+            placeholder="Ville..."
+            className="pl-10"
+          />
         </div>
-        <Select>
+        <Select value={type} onValueChange={setType}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Contrat" />
           </SelectTrigger>
@@ -111,9 +93,20 @@ const SeekerSearch = () => {
       </p>
 
       <div className="space-y-3">
+        {loading && (
+          <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+            Chargement des offres...
+          </div>
+        )}
+        {!loading && jobs.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            Aucune offre ne correspond a votre recherche.
+          </div>
+        )}
         {jobs.map((job) => (
-          <div
-            key={job.title}
+          <Link
+            key={job.id}
+            to={`/jobs/${job.id}`}
             className="group flex items-center justify-between rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/20 hover:shadow-[var(--card-shadow)]"
           >
             <div className="flex items-center gap-4">
@@ -156,14 +149,14 @@ const SeekerSearch = () => {
               </span>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Bookmark
-                  className={`h-4 w-4 ${job.saved ? "fill-primary text-primary" : ""}`}
+                  className="h-4 w-4"
                 />
               </Button>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </DashboardLayout>

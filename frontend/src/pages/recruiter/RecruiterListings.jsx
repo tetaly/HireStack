@@ -1,49 +1,35 @@
+import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Eye, Edit, Trash2, MapPin, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const listings = [
-  {
-    title: "Développeur Full Stack",
-    location: "Paris",
-    type: "CDI",
-    apps: 23,
-    views: 456,
-    status: "Actif",
-    posted: "10 Jan",
-  },
-  {
-    title: "Product Designer",
-    location: "Lyon · Hybride",
-    type: "CDI",
-    apps: 15,
-    views: 289,
-    status: "Actif",
-    posted: "9 Jan",
-  },
-  {
-    title: "Data Analyst",
-    location: "Télétravail",
-    type: "CDI",
-    apps: 8,
-    views: 178,
-    status: "Actif",
-    posted: "7 Jan",
-  },
-  {
-    title: "Stagiaire Marketing",
-    location: "Bordeaux",
-    type: "Stage",
-    apps: 34,
-    views: 567,
-    status: "Expiré",
-    posted: "1 Déc",
-  },
-];
+import { recruiterJobsApi } from "@/lib/api";
 
 const RecruiterListings = () => {
   const navigate = useNavigate();
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    recruiterJobsApi
+      .list()
+      .then((data) => {
+        if (active) {
+          setListings(data.jobs);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <DashboardLayout role="recruiter" title="Mes offres">
@@ -61,9 +47,19 @@ const RecruiterListings = () => {
       </div>
 
       <div className="space-y-4">
+        {loading && (
+          <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+            Chargement des offres...
+          </div>
+        )}
+        {!loading && listings.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            Aucune offre publiee pour le moment.
+          </div>
+        )}
         {listings.map((l) => (
           <div
-            key={l.title}
+            key={l.id}
             className="flex items-center justify-between rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/20"
           >
             <div>
@@ -76,7 +72,7 @@ const RecruiterListings = () => {
                 </span>
                 <span>{l.type}</span>
                 <span className="flex items-center gap-1">
-                  <Users className="h-3 w-3" /> {l.apps} candidatures
+                  <Users className="h-3 w-3" /> {l.applications} candidatures
                 </span>
                 <span className="flex items-center gap-1">
                   <Eye className="h-3 w-3" /> {l.views} vues
@@ -85,9 +81,9 @@ const RecruiterListings = () => {
             </div>
             <div className="flex items-center gap-2">
               <span
-                className={`rounded-full px-2 py-0.5 text-xs font-medium ${l.status === "Actif" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"}`}
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${l.status === "active" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"}`}
               >
-                {l.status}
+                {l.status === "active" ? "Actif" : "Brouillon"}
               </span>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Edit className="h-3.5 w-3.5" />

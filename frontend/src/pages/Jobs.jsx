@@ -1,138 +1,92 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import FooterSection from "@/components/FooterSection";
 import JobCard from "@/components/JobCard";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Search, MapPin, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
-
-export const allJobs = [
-  {
-    id: "1",
-    title: "Développeur Full Stack",
-    company: "TechVision",
-    location: "Paris",
-    type: "CDI",
-    salary: "55-70k €",
-    tags: ["React", "Node.js", "TypeScript"],
-    posted: "il y a 2h",
-    featured: true,
-    category: "Tech",
-  },
-  {
-    id: "2",
-    title: "Product Designer Senior",
-    company: "DesignLab",
-    location: "Lyon · Hybride",
-    type: "CDI",
-    salary: "50-62k €",
-    tags: ["Figma", "UX Research", "Design System"],
-    posted: "il y a 5h",
-    featured: true,
-    category: "Design",
-  },
-  {
-    id: "3",
-    title: "Data Analyst",
-    company: "DataCore",
-    location: "Télétravail",
-    type: "CDI",
-    salary: "45-55k €",
-    tags: ["SQL", "Python", "Tableau"],
-    posted: "il y a 8h",
-    featured: false,
-    category: "Data",
-  },
-  {
-    id: "4",
-    title: "Responsable Marketing",
-    company: "GrowthUp",
-    location: "Bordeaux",
-    type: "CDI",
-    salary: "48-58k €",
-    tags: ["SEO", "Growth", "Analytics"],
-    posted: "il y a 1j",
-    featured: false,
-    category: "Marketing",
-  },
-  {
-    id: "5",
-    title: "Ingénieur DevOps",
-    company: "CloudNine",
-    location: "Nantes · Hybride",
-    type: "CDI",
-    salary: "52-65k €",
-    tags: ["AWS", "Docker", "Kubernetes"],
-    posted: "il y a 1j",
-    featured: false,
-    category: "Tech",
-  },
-  {
-    id: "6",
-    title: "Chef de Projet Digital",
-    company: "AgencyX",
-    location: "Paris",
-    type: "CDD",
-    salary: "42-50k €",
-    tags: ["Agile", "Scrum", "Jira"],
-    posted: "il y a 2j",
-    featured: false,
-    category: "Gestion",
-  },
-  {
-    id: "7",
-    title: "Backend Developer Go",
-    company: "ScaleIO",
-    location: "Télétravail",
-    type: "CDI",
-    salary: "60-75k €",
-    tags: ["Go", "PostgreSQL", "gRPC"],
-    posted: "il y a 2j",
-    featured: false,
-    category: "Tech",
-  },
-  {
-    id: "8",
-    title: "UX Researcher",
-    company: "PixelHub",
-    location: "Marseille",
-    type: "CDI",
-    salary: "45-55k €",
-    tags: ["Recherche", "Interviews", "Tests"],
-    posted: "il y a 3j",
-    featured: false,
-    category: "Design",
-  },
-  {
-    id: "9",
-    title: "Comptable",
-    company: "FinPro",
-    location: "Toulouse",
-    type: "CDI",
-    salary: "38-45k €",
-    tags: ["Sage", "Fiscalité"],
-    posted: "il y a 4j",
-    featured: false,
-    category: "Finance",
-  },
-];
+import { jobsApi } from "@/lib/api";
 
 const types = ["Tous", "CDI", "CDD", "Stage", "Freelance"];
+const PAGE_SIZE = 12;
 
 const Jobs = () => {
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
   const [activeType, setActiveType] = useState("Tous");
-
-  const filtered = allJobs.filter((j) => {
-    const matchQ =
-      j.title.toLowerCase().includes(query.toLowerCase()) ||
-      j.company.toLowerCase().includes(query.toLowerCase());
-    const matchL = j.location.toLowerCase().includes(location.toLowerCase());
-    const matchT = activeType === "Tous" || j.type === activeType;
-    return matchQ && matchL && matchT;
+  const [jobs, setJobs] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: PAGE_SIZE,
+    total: 0,
+    totalPages: 1,
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, [query, location, activeType]);
+
+  useEffect(() => {
+    let active = true;
+
+    setLoading(true);
+    jobsApi
+      .list({
+        q: query,
+        location,
+        type: activeType === "Tous" ? "" : activeType,
+        page: pagination.page,
+        limit: PAGE_SIZE,
+      })
+      .then((data) => {
+        if (active) {
+          setJobs(data.jobs);
+          setPagination(data.pagination);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setJobs([]);
+          setPagination({
+            page: 1,
+            limit: PAGE_SIZE,
+            total: 0,
+            totalPages: 1,
+          });
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [query, location, activeType, pagination.page]);
+
+  const pages = Array.from({ length: pagination.totalPages }, (_, index) => index + 1)
+    .filter((pageNumber) => {
+      if (pagination.totalPages <= 7) {
+        return true;
+      }
+
+      return (
+        pageNumber === 1 ||
+        pageNumber === pagination.totalPages ||
+        Math.abs(pageNumber - pagination.page) <= 1
+      );
+    });
+
+  const goToPage = (page) => {
+    setPagination((current) => ({
+      ...current,
+      page: Math.min(Math.max(page, 1), current.totalPages),
+    }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -144,29 +98,31 @@ const Jobs = () => {
             Toutes les offres
           </h1>
           <p className="mt-2 text-muted-foreground">
-            {allJobs.length} opportunités disponibles
+            {pagination.total} opportunités disponibles
           </p>
 
-          <div className="mt-6 flex flex-col gap-3 rounded-xl border border-border bg-card p-3 md:flex-row">
-            <div className="flex flex-1 items-center gap-2 rounded-lg border border-border px-3">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
+          <div className="mt-6 grid gap-3 rounded-xl border border-border bg-card p-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+            <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-background px-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Métier, entreprise, mot-clé"
-                className="border-0 focus-visible:ring-0"
+                className="h-10 min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
-            <div className="flex flex-1 items-center gap-2 rounded-lg border border-border px-3">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <Input
+            <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-background px-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+              <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Ville ou télétravail"
-                className="border-0 focus-visible:ring-0"
+                className="h-10 min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
-            <Button variant="hero">Rechercher</Button>
+            <Button variant="hero" className="h-10 px-6">
+              Rechercher
+            </Button>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -190,17 +146,72 @@ const Jobs = () => {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
+              Chargement des offres...
+            </div>
+          ) : jobs.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
               Aucune offre ne correspond à votre recherche.
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((job) => (
-                <Link key={job.id} to={`/jobs/${job.id}`}>
+              {jobs.map((job) => (
+                <Link key={job.id} to={`/jobs/${job.id}`} className="h-full">
                   <JobCard {...job} />
                 </Link>
               ))}
+            </div>
+          )}
+
+          {!loading && pagination.totalPages > 1 && (
+            <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row">
+              <p className="text-sm text-muted-foreground">
+                Page {pagination.page} sur {pagination.totalPages}
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={pagination.page === 1}
+                  onClick={() => goToPage(pagination.page - 1)}
+                >
+                  Précédent
+                </Button>
+
+                {pages.map((pageNumber, index) => {
+                  const previous = pages[index - 1];
+                  const showGap = previous && pageNumber - previous > 1;
+
+                  return (
+                    <div key={pageNumber} className="flex items-center gap-2">
+                      {showGap && (
+                        <span className="px-1 text-sm text-muted-foreground">
+                          ...
+                        </span>
+                      )}
+                      <Button
+                        variant={pageNumber === pagination.page ? "hero" : "outline"}
+                        size="sm"
+                        className="h-9 w-9 px-0"
+                        onClick={() => goToPage(pageNumber)}
+                      >
+                        {pageNumber}
+                      </Button>
+                    </div>
+                  );
+                })}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={pagination.page === pagination.totalPages}
+                  onClick={() => goToPage(pagination.page + 1)}
+                >
+                  Suivant
+                </Button>
+              </div>
             </div>
           )}
         </div>

@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import JobCard from "@/components/JobCard";
@@ -5,71 +7,34 @@ import CategoriesSection from "@/components/CategoriesSection";
 import StatsSection from "@/components/StatsSection";
 import FooterSection from "@/components/FooterSection";
 import { Button } from "@/components/ui/button";
-
-const featuredJobs = [
-  {
-    title: "Développeur Full Stack",
-    company: "TechVision",
-    location: "Paris",
-    type: "CDI",
-    salary: "55-70k €",
-    tags: ["React", "Node.js", "TypeScript"],
-    posted: "il y a 2h",
-    featured: true,
-  },
-  {
-    title: "Product Designer Senior",
-    company: "DesignLab",
-    location: "Lyon · Hybride",
-    type: "CDI",
-    salary: "50-62k €",
-    tags: ["Figma", "UX Research", "Design System"],
-    posted: "il y a 5h",
-    featured: true,
-  },
-  {
-    title: "Data Analyst",
-    company: "DataCore",
-    location: "Télétravail",
-    type: "CDI",
-    salary: "45-55k €",
-    tags: ["SQL", "Python", "Tableau"],
-    posted: "il y a 8h",
-    featured: false,
-  },
-  {
-    title: "Responsable Marketing",
-    company: "GrowthUp",
-    location: "Bordeaux",
-    type: "CDI",
-    salary: "48-58k €",
-    tags: ["SEO", "Growth", "Analytics"],
-    posted: "il y a 1j",
-    featured: false,
-  },
-  {
-    title: "Ingénieur DevOps",
-    company: "CloudNine",
-    location: "Nantes · Hybride",
-    type: "CDI",
-    salary: "52-65k €",
-    tags: ["AWS", "Docker", "Kubernetes"],
-    posted: "il y a 1j",
-    featured: false,
-  },
-  {
-    title: "Chef de Projet Digital",
-    company: "AgencyX",
-    location: "Paris",
-    type: "CDD",
-    salary: "42-50k €",
-    tags: ["Agile", "Scrum", "Jira"],
-    posted: "il y a 2j",
-    featured: false,
-  },
-];
+import { jobsApi } from "@/lib/api";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    jobsApi
+      .list()
+      .then((data) => {
+        if (active) {
+          setFeaturedJobs(data.jobs.slice(0, 6));
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -88,19 +53,37 @@ const Index = () => {
                 partenaires
               </p>
             </div>
-            <Button variant="hero-outline" className="hidden md:inline-flex">
+            <Button
+              variant="hero-outline"
+              className="hidden md:inline-flex"
+              onClick={() => navigate("/jobs")}
+            >
               Voir toutes les offres
             </Button>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {featuredJobs.map((job) => (
-              <JobCard key={job.title + job.company} {...job} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
+              Chargement des offres...
+            </div>
+          ) : featuredJobs.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
+              Aucune offre publiee pour le moment.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {featuredJobs.map((job) => (
+                <Link key={job.id} to={`/jobs/${job.id}`} className="h-full">
+                  <JobCard {...job} />
+                </Link>
+              ))}
+            </div>
+          )}
 
           <div className="mt-8 text-center md:hidden">
-            <Button variant="hero-outline">Voir toutes les offres</Button>
+            <Button variant="hero-outline" onClick={() => navigate("/jobs")}>
+              Voir toutes les offres
+            </Button>
           </div>
         </div>
       </section>
