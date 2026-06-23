@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Camera, Plus, Trash2 } from "lucide-react";
+import { Camera, Plus, Trash2, UserCircle, Briefcase, GraduationCap, Code2, Save, Download, Globe } from "lucide-react";
 import { authStorage, seekerProfileApi } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -169,7 +169,7 @@ const SeekerProfile = () => {
       const updated = await seekerProfileApi.update(buildProfilePayload());
 
       applyUpdatedProfile(updated);
-      toast.success("Profil mis a jour");
+      toast.success("Profil mis à jour avec succès");
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -182,7 +182,7 @@ const SeekerProfile = () => {
       const updated = await seekerProfileApi.update(buildProfilePayload(avatarDataUrl));
 
       applyUpdatedProfile(updated);
-      toast.success("Image de profil mise a jour");
+      toast.success("Image de profil mise à jour");
     } catch (error) {
       toast.error(error.message);
     }
@@ -211,427 +211,361 @@ const SeekerProfile = () => {
     event.target.value = "";
   };
 
+  if (loading) {
+    return (
+      <DashboardLayout role="seeker" title="Mon profil">
+        <div className="mx-auto max-w-4xl space-y-6">
+          <div className="h-48 rounded-2xl border border-border bg-card/50 animate-pulse"></div>
+          <div className="h-96 rounded-2xl border border-border bg-card/50 animate-pulse"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout role="seeker" title="Mon profil">
-      <div className="mx-auto max-w-2xl space-y-6">
-        {loading && (
-          <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
-            Chargement du profil...
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="font-heading text-2xl font-bold text-foreground">Éditer le profil</h2>
+            <p className="text-muted-foreground mt-1">Gérez vos informations personnelles et votre CV numérique.</p>
           </div>
-        )}
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="rounded-xl shadow-sm border-border bg-card hover:bg-secondary">
+              <Globe className="mr-2 h-4 w-4 text-muted-foreground" /> Voir profil public
+            </Button>
+            <Button variant="hero" disabled={saving} onClick={saveProfileInfo} className="rounded-xl shadow-sm">
+              <Save className="mr-2 h-4 w-4" />
+              {saving ? "Sauvegarde..." : "Enregistrer"}
+            </Button>
+          </div>
+        </div>
 
-        {/* Photo + basic info */}
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="flex items-center gap-5">
-            <div className="relative">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 font-heading text-2xl font-bold text-primary">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={fullName}
-                    className="h-full w-full rounded-full object-cover"
-                  />
-                ) : (
-                  initials
-                )}
-              </div>
-              <label className="absolute -bottom-1 -right-1 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <Camera className="h-3.5 w-3.5" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={handleAvatarChange}
-                />
-              </label>
-            </div>
-            <div className="flex-1">
-              <h2 className="font-heading text-lg font-semibold text-foreground">
-                {[form.firstName, form.lastName].filter(Boolean).join(" ") ||
-                  fullName}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {[form.headline, form.location].filter(Boolean).join(" · ") ||
-                  user?.email}
-              </p>
-              <div className="mt-2 flex gap-2">
-                <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-                  Disponible
-                </span>
-                {form.yearsExperience !== "" &&
-                  form.yearsExperience !== null &&
-                  form.yearsExperience !== undefined && (
-                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
-                      {form.yearsExperience} ans d'expérience
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Main Content Area */}
+          <div className="lg:col-span-2 space-y-8">
+            
+            {/* LinkedIn-style Cover & Avatar Card */}
+            <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden relative">
+              <div className="h-32 bg-gradient-to-r from-primary/80 to-blue-400"></div>
+              <div className="px-6 pb-6">
+                <div className="relative flex justify-between items-end -mt-12 mb-4">
+                  <div className="relative">
+                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl border-4 border-card bg-card font-heading text-3xl font-bold text-primary shadow-sm overflow-hidden">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt={fullName}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-primary/10 flex items-center justify-center">
+                          {initials}
+                        </div>
+                      )}
+                    </div>
+                    <label className="absolute -bottom-2 -right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-background border border-border shadow-sm text-foreground hover:bg-secondary transition-colors">
+                      <Camera className="h-4 w-4" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={handleAvatarChange}
+                      />
+                    </label>
+                  </div>
+                  <Button variant="outline" size="sm" className="rounded-lg h-9">
+                    <Download className="mr-2 h-4 w-4" /> Télécharger CV
+                  </Button>
+                </div>
+                
+                <div>
+                  <h2 className="font-heading text-2xl font-bold text-foreground">
+                    {[form.firstName, form.lastName].filter(Boolean).join(" ") || fullName}
+                  </h2>
+                  <p className="text-lg text-foreground mt-1 font-medium">
+                    {form.headline || "Titre professionnel"}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {[form.location, form.email].filter(Boolean).join(" · ")}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="rounded-lg bg-emerald-500/10 px-3 py-1 text-sm font-semibold text-emerald-600 border border-emerald-500/20">
+                      À l'écoute d'opportunités
                     </span>
+                    {form.yearsExperience && (
+                      <span className="rounded-lg bg-secondary px-3 py-1 text-sm font-medium text-secondary-foreground border border-border">
+                        {form.yearsExperience} ans d'expérience
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* About / Bio */}
+            <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+              <div className="border-b border-border bg-slate-50/50 p-5 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <UserCircle className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-lg font-semibold text-foreground">À propos</h3>
+                  <p className="text-xs text-muted-foreground">Présentez-vous en quelques lignes</p>
+                </div>
+              </div>
+              <div className="p-6">
+                <Textarea
+                  rows={5}
+                  value={form.bio}
+                  onChange={updateField("bio")}
+                  className="rounded-xl resize-y bg-background"
+                  placeholder="Décrivez votre parcours, vos ambitions et le type d'opportunité recherchée..."
+                />
+              </div>
+            </div>
+
+            {/* Experience Timeline */}
+            <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+              <div className="border-b border-border bg-slate-50/50 p-5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Briefcase className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading text-lg font-semibold text-foreground">Expérience</h3>
+                    <p className="text-xs text-muted-foreground">Votre parcours professionnel</p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg"
+                  onClick={() => setExperiences((current) => [{ ...emptyExperience }, ...current])}
+                >
+                  <Plus className="mr-1 h-4 w-4" /> Ajouter
+                </Button>
+              </div>
+              <div className="p-6 space-y-6">
+                {experiences.length === 0 && (
+                  <div className="text-center p-6 border-2 border-dashed border-border rounded-xl">
+                    <p className="text-sm text-muted-foreground mb-4">Aucune expérience ajoutée.</p>
+                    <Button variant="outline" onClick={() => setExperiences([{ ...emptyExperience }])}>
+                      Ajouter une expérience
+                    </Button>
+                  </div>
+                )}
+                {experiences.map((exp, index) => (
+                  <div key={index} className="relative pl-6 pb-6 border-l-2 border-border last:border-0 last:pb-0">
+                    <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-primary ring-4 ring-card"></div>
+                    <div className="space-y-4 rounded-xl border border-border bg-secondary/20 p-5 ml-2">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-3 flex-1 mr-4">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1.5">
+                              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Poste</Label>
+                              <Input className="h-9 rounded-lg bg-background" value={exp.title ?? ""} onChange={(e) => updateListItem(setExperiences, index, "title", e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Entreprise</Label>
+                              <Input className="h-9 rounded-lg bg-background" value={exp.companyName ?? ""} onChange={(e) => updateListItem(setExperiences, index, "companyName", e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date début</Label>
+                              <Input type="date" className="h-9 rounded-lg bg-background" value={exp.startDate ?? ""} onChange={(e) => updateListItem(setExperiences, index, "startDate", e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between items-center">
+                                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date fin</Label>
+                                <label className="flex items-center gap-1.5 text-xs text-foreground font-medium cursor-pointer">
+                                  <input type="checkbox" checked={Boolean(exp.isCurrent)} className="rounded border-border text-primary focus:ring-primary/20" onChange={(e) => updateListItem(setExperiences, index, "isCurrent", e.target.checked)} />
+                                  Poste actuel
+                                </label>
+                              </div>
+                              <Input type="date" className="h-9 rounded-lg bg-background" value={exp.endDate ?? ""} disabled={Boolean(exp.isCurrent)} onChange={(e) => updateListItem(setExperiences, index, "endDate", e.target.value)} />
+                            </div>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Description</Label>
+                            <Textarea rows={3} className="rounded-lg bg-background resize-y text-sm" value={exp.description ?? ""} onChange={(e) => updateListItem(setExperiences, index, "description", e.target.value)} />
+                          </div>
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive shrink-0" onClick={() => removeListItem(setExperiences, index)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Education Timeline */}
+            <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+              <div className="border-b border-border bg-slate-50/50 p-5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <GraduationCap className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading text-lg font-semibold text-foreground">Formation</h3>
+                    <p className="text-xs text-muted-foreground">Vos diplômes et études</p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg"
+                  onClick={() => setEducations((current) => [{ ...emptyEducation }, ...current])}
+                >
+                  <Plus className="mr-1 h-4 w-4" /> Ajouter
+                </Button>
+              </div>
+              <div className="p-6 space-y-6">
+                {educations.length === 0 && (
+                  <div className="text-center p-6 border-2 border-dashed border-border rounded-xl">
+                    <p className="text-sm text-muted-foreground mb-4">Aucune formation ajoutée.</p>
+                    <Button variant="outline" onClick={() => setEducations([{ ...emptyEducation }])}>
+                      Ajouter une formation
+                    </Button>
+                  </div>
+                )}
+                {educations.map((edu, index) => (
+                  <div key={index} className="relative pl-6 pb-6 border-l-2 border-border last:border-0 last:pb-0">
+                    <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-primary ring-4 ring-card"></div>
+                    <div className="space-y-4 rounded-xl border border-border bg-secondary/20 p-5 ml-2">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-3 flex-1 mr-4">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1.5">
+                              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Diplôme</Label>
+                              <Input className="h-9 rounded-lg bg-background" value={edu.degree ?? ""} onChange={(e) => updateListItem(setEducations, index, "degree", e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">École</Label>
+                              <Input className="h-9 rounded-lg bg-background" value={edu.schoolName ?? ""} onChange={(e) => updateListItem(setEducations, index, "schoolName", e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Domaine</Label>
+                              <Input className="h-9 rounded-lg bg-background" value={edu.fieldOfStudy ?? ""} onChange={(e) => updateListItem(setEducations, index, "fieldOfStudy", e.target.value)} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Début</Label>
+                                <Input type="number" className="h-9 rounded-lg bg-background" value={edu.startYear ?? ""} onChange={(e) => updateListItem(setEducations, index, "startYear", e.target.value)} />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fin</Label>
+                                <Input type="number" className="h-9 rounded-lg bg-background" value={edu.endYear ?? ""} onChange={(e) => updateListItem(setEducations, index, "endYear", e.target.value)} />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Description</Label>
+                            <Textarea rows={2} className="rounded-lg bg-background resize-y text-sm" value={edu.description ?? ""} onChange={(e) => updateListItem(setEducations, index, "description", e.target.value)} />
+                          </div>
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive shrink-0" onClick={() => removeListItem(setEducations, index)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+          {/* Sidebar Area */}
+          <div className="space-y-8">
+            
+            {/* Personal Details */}
+            <div className="rounded-2xl border border-border bg-card shadow-sm p-6 sticky top-24">
+              <h3 className="font-heading text-lg font-semibold text-foreground mb-4">Informations</h3>
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prénom</Label>
+                  <Input className="h-10 rounded-xl" value={form.firstName} onChange={updateField("firstName")} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nom</Label>
+                  <Input className="h-10 rounded-xl" value={form.lastName} onChange={updateField("lastName")} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email</Label>
+                  <Input className="h-10 rounded-xl" value={form.email} onChange={updateField("email")} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Téléphone</Label>
+                  <Input className="h-10 rounded-xl" value={form.phone} onChange={updateField("phone")} placeholder="+33 6..." />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Localisation</Label>
+                  <Input className="h-10 rounded-xl" value={form.location} onChange={updateField("location")} placeholder="Ville, Pays" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Titre / Rôle</Label>
+                  <Input className="h-10 rounded-xl" value={form.headline} onChange={updateField("headline")} placeholder="Titre professionnel" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Expérience (Années)</Label>
+                  <Input type="number" min="0" className="h-10 rounded-xl" value={form.yearsExperience} onChange={updateField("yearsExperience")} />
+                </div>
+              </div>
+            </div>
+
+            {/* Skills Card */}
+            <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+              <div className="border-b border-border bg-slate-50/50 p-5 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Code2 className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-lg font-semibold text-foreground">Compétences</h3>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex gap-2 mb-4">
+                  <Input
+                    className="h-10 rounded-xl bg-secondary/30"
+                    value={skillInput}
+                    onChange={(event) => setSkillInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        addSkill();
+                      }
+                    }}
+                    placeholder="Ajouter (ex: React)"
+                  />
+                  <Button type="button" variant="outline" className="rounded-xl px-3 shrink-0" onClick={addSkill}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {skills.length === 0 && (
+                    <p className="text-sm text-muted-foreground">Aucune compétence ajoutée.</p>
                   )}
+                  {skills.map((skill) => (
+                    <button
+                      type="button"
+                      key={skill}
+                      className="rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-sm font-medium text-primary hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-colors flex items-center gap-1 group"
+                      onClick={() => setSkills((current) => current.filter((item) => item !== skill))}
+                    >
+                      {skill} 
+                      <Trash2 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
+
           </div>
         </div>
-
-        {/* Personal info */}
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-          <h3 className="font-heading text-base font-semibold text-foreground">
-            Informations personnelles
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Prénom</Label>
-              <Input value={form.firstName} onChange={updateField("firstName")} />
-            </div>
-            <div className="space-y-2">
-              <Label>Nom</Label>
-              <Input value={form.lastName} onChange={updateField("lastName")} />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input value={form.email} onChange={updateField("email")} />
-          </div>
-          <div className="space-y-2">
-            <Label>Téléphone</Label>
-            <Input
-              value={form.phone}
-              onChange={updateField("phone")}
-              placeholder="+33 6 12 34 56 78"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Titre professionnel</Label>
-            <Input
-              value={form.headline}
-              onChange={updateField("headline")}
-              placeholder="Développeur Full Stack"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Localisation</Label>
-            <Input
-              value={form.location}
-              onChange={updateField("location")}
-              placeholder="Paris, France"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Années d'expérience</Label>
-            <Input
-              type="number"
-              min="0"
-              value={form.yearsExperience}
-              onChange={updateField("yearsExperience")}
-              placeholder="3"
-            />
-          </div>
-        </div>
-
-        {/* Bio */}
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-          <h3 className="font-heading text-base font-semibold text-foreground">
-            À propos
-          </h3>
-          <Textarea
-            rows={4}
-            value={form.bio}
-            onChange={updateField("bio")}
-            placeholder="Presentez votre parcours, vos competences et le type d'opportunite recherchee."
-          />
-        </div>
-
-        <Button variant="hero" size="lg" disabled={saving} onClick={saveProfileInfo}>
-          {saving ? "Sauvegarde..." : "Sauvegarder le profil"}
-        </Button>
-
-        {/* Skills */}
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-heading text-base font-semibold text-foreground">
-              Compétences
-            </h3>
-          </div>
-          <div className="flex gap-2">
-            <Input
-              value={skillInput}
-              onChange={(event) => setSkillInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  addSkill();
-                }
-              }}
-              placeholder="ex: React, Symfony, SQL"
-            />
-            <Button type="button" variant="outline" onClick={addSkill}>
-              <Plus className="mr-2 h-4 w-4" /> Ajouter
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {skills.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                Aucune competence ajoutee.
-              </p>
-            )}
-            {skills.map((skill) => (
-              <button
-                type="button"
-                key={skill}
-                className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
-                onClick={() =>
-                  setSkills((current) => current.filter((item) => item !== skill))
-                }
-              >
-                {skill} ×
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Experience */}
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-heading text-base font-semibold text-foreground">
-              Expérience
-            </h3>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setExperiences((current) => [...current, { ...emptyExperience }])
-              }
-            >
-              <Plus className="mr-2 h-4 w-4" /> Ajouter
-            </Button>
-          </div>
-          {experiences.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              Aucune experience ajoutee.
-            </p>
-          )}
-          {experiences.map((exp, index) => (
-            <div
-              key={index}
-              className="space-y-3 rounded-lg border border-border p-4"
-            >
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeListItem(setExperiences, index)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Poste</Label>
-                  <Input
-                    value={exp.title ?? ""}
-                    onChange={(event) =>
-                      updateListItem(setExperiences, index, "title", event.target.value)
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Entreprise</Label>
-                  <Input
-                    value={exp.companyName ?? ""}
-                    onChange={(event) =>
-                      updateListItem(
-                        setExperiences,
-                        index,
-                        "companyName",
-                        event.target.value,
-                      )
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Date début</Label>
-                  <Input
-                    type="date"
-                    value={exp.startDate ?? ""}
-                    onChange={(event) =>
-                      updateListItem(
-                        setExperiences,
-                        index,
-                        "startDate",
-                        event.target.value,
-                      )
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Date fin</Label>
-                  <Input
-                    type="date"
-                    value={exp.endDate ?? ""}
-                    disabled={Boolean(exp.isCurrent)}
-                    onChange={(event) =>
-                      updateListItem(setExperiences, index, "endDate", event.target.value)
-                    }
-                  />
-                </div>
-              </div>
-              <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                <input
-                  type="checkbox"
-                  checked={Boolean(exp.isCurrent)}
-                  onChange={(event) =>
-                    updateListItem(
-                      setExperiences,
-                      index,
-                      "isCurrent",
-                      event.target.checked,
-                    )
-                  }
-                />
-                Poste actuel
-              </label>
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <Textarea
-                  rows={3}
-                  value={exp.description ?? ""}
-                  onChange={(event) =>
-                    updateListItem(
-                      setExperiences,
-                      index,
-                      "description",
-                      event.target.value,
-                    )
-                  }
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-heading text-base font-semibold text-foreground">
-              Études
-            </h3>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setEducations((current) => [...current, { ...emptyEducation }])
-              }
-            >
-              <Plus className="mr-2 h-4 w-4" /> Ajouter
-            </Button>
-          </div>
-          {educations.length === 0 && (
-            <p className="text-sm text-muted-foreground">Aucune etude ajoutee.</p>
-          )}
-          {educations.map((education, index) => (
-            <div key={index} className="space-y-3 rounded-lg border border-border p-4">
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeListItem(setEducations, index)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Diplôme</Label>
-                  <Input
-                    value={education.degree ?? ""}
-                    onChange={(event) =>
-                      updateListItem(setEducations, index, "degree", event.target.value)
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>École</Label>
-                  <Input
-                    value={education.schoolName ?? ""}
-                    onChange={(event) =>
-                      updateListItem(
-                        setEducations,
-                        index,
-                        "schoolName",
-                        event.target.value,
-                      )
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Domaine</Label>
-                  <Input
-                    value={education.fieldOfStudy ?? ""}
-                    onChange={(event) =>
-                      updateListItem(
-                        setEducations,
-                        index,
-                        "fieldOfStudy",
-                        event.target.value,
-                      )
-                    }
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-2">
-                    <Label>Début</Label>
-                    <Input
-                      type="number"
-                      value={education.startYear ?? ""}
-                      onChange={(event) =>
-                        updateListItem(
-                          setEducations,
-                          index,
-                          "startYear",
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Fin</Label>
-                    <Input
-                      type="number"
-                      value={education.endYear ?? ""}
-                      onChange={(event) =>
-                        updateListItem(
-                          setEducations,
-                          index,
-                          "endYear",
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <Textarea
-                  rows={3}
-                  value={education.description ?? ""}
-                  onChange={(event) =>
-                    updateListItem(
-                      setEducations,
-                      index,
-                      "description",
-                      event.target.value,
-                    )
-                  }
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <Button variant="hero" size="lg" disabled={saving} onClick={saveProfileInfo}>
-          {saving ? "Sauvegarde..." : "Sauvegarder toutes les modifications"}
-        </Button>
       </div>
     </DashboardLayout>
   );

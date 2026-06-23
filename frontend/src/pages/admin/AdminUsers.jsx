@@ -1,7 +1,8 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Shield, Trash2 } from "lucide-react";
+import { Search, Shield, Trash2, Filter } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const users = [
   {
@@ -51,101 +52,93 @@ const users = [
 const AdminUsers = () => {
   return (
     <DashboardLayout role="admin" title="Gestion des utilisateurs">
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-sm flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Rechercher un utilisateur..." className="pl-10" />
+          <Input 
+            placeholder="Rechercher par nom ou email..." 
+            className="pl-10 h-10 rounded-xl bg-card border-border shadow-sm focus-visible:ring-primary/20" 
+          />
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-muted-foreground mr-1 hidden sm:inline-block">Filtrer :</span>
+          <Button variant="solid" size="sm" className="rounded-full shadow-sm">
             Tous
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="rounded-full bg-card shadow-sm border-border">
             Recruteurs
           </Button>
-          <Button variant="outline" size="sm">
-            Chercheurs
+          <Button variant="outline" size="sm" className="rounded-full bg-card shadow-sm border-border">
+            Candidats
           </Button>
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border bg-secondary/50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">
-                Utilisateur
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">
-                Rôle
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">
-                Statut
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">
-                Inscrit le
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {users.map((u) => (
-              <tr
-                key={u.email}
-                className="hover:bg-secondary/30 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-heading text-xs font-bold text-primary">
-                      {u.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-foreground">
-                        {u.name}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {u.email}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.role === "Recruteur" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary"}`}
-                  >
-                    {u.role}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.status === "Actif" ? "bg-accent/10 text-accent" : "bg-destructive/10 text-destructive"}`}
-                  >
-                    {u.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-muted-foreground">
-                  {u.joined}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Shield className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </td>
+      <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50/80 text-xs font-semibold uppercase text-muted-foreground border-b border-border">
+              <tr>
+                <th className="px-6 py-4">Utilisateur</th>
+                <th className="px-6 py-4">Rôle</th>
+                <th className="px-6 py-4">Statut</th>
+                <th className="px-6 py-4">Inscrit le</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {users.map((u) => (
+                <tr
+                  key={u.email}
+                  className="transition-colors hover:bg-slate-50/50 group"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading font-bold text-primary">
+                        {u.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                          {u.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {u.email}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <Badge variant={u.role === "Recruteur" ? "warning" : "info"}>
+                      {u.role}
+                    </Badge>
+                  </td>
+                  <td className="px-6 py-4">
+                    <Badge variant={u.status === "Actif" ? "success" : "destructive"}>
+                      {u.status}
+                    </Badge>
+                  </td>
+                  <td className="px-6 py-4 text-muted-foreground font-medium">
+                    {u.joined}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg">
+                        <Shield className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </DashboardLayout>
   );

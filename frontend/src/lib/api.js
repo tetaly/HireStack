@@ -124,3 +124,9 @@ export const recruiterJobsApi = {
     });
   },
 };
+
+export const adminApi = {
+  getStats() {
+    return apiRequest("/admin/stats");
+  }
+};
