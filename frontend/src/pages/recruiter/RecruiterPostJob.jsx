@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FileText, Save, CheckCircle2, AlignLeft, Briefcase } from "lucide-react";
 import { recruiterJobsApi } from "@/lib/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -51,7 +52,7 @@ const RecruiterPostJob = () => {
           .filter(Boolean),
       });
 
-      toast.success(status === "draft" ? "Brouillon sauvegarde" : "Offre publiee");
+      toast.success(status === "draft" ? "Brouillon sauvegardé" : "Offre publiée avec succès");
       navigate("/recruiter/listings");
     } catch (error) {
       toast.error(error.message);
@@ -62,141 +63,191 @@ const RecruiterPostJob = () => {
 
   return (
     <DashboardLayout role="recruiter" title="Publier une offre">
-      <div className="mx-auto max-w-2xl">
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-            <h2 className="font-heading text-lg font-semibold text-foreground">
-              Informations de l'offre
-            </h2>
-            <div className="space-y-2">
-              <Label>Titre du poste</Label>
-              <Input
-                value={form.title}
-                onChange={updateField("title")}
-                placeholder="ex: Développeur Full Stack React/Node.js"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Type de contrat</Label>
-                <Select
-                  value={form.contractType}
-                  onValueChange={(value) =>
-                    setForm((current) => ({ ...current, contractType: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cdi">CDI</SelectItem>
-                    <SelectItem value="cdd">CDD</SelectItem>
-                    <SelectItem value="freelance">Freelance</SelectItem>
-                    <SelectItem value="stage">Stage</SelectItem>
-                    <SelectItem value="alternance">Alternance</SelectItem>
-                  </SelectContent>
-                </Select>
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-8">
+          <h2 className="font-heading text-2xl font-bold text-foreground">Créer une annonce</h2>
+          <p className="text-muted-foreground mt-2">Remplissez les informations ci-dessous pour attirer les meilleurs talents.</p>
+        </div>
+
+        <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+          
+          {/* Basic Info Section */}
+          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+            <div className="border-b border-border bg-slate-50/50 p-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Briefcase className="h-5 w-5" />
               </div>
-              <div className="space-y-2">
-                <Label>Localisation</Label>
-                <Input
-                  value={form.location}
-                  onChange={updateField("location")}
-                  placeholder="ex: Paris, Télétravail"
-                />
+              <div>
+                <h3 className="font-heading text-lg font-semibold text-foreground">Informations de base</h3>
+                <p className="text-xs text-muted-foreground">Les détails essentiels de votre offre</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            
+            <div className="p-6 space-y-6">
               <div className="space-y-2">
-                <Label>Salaire min (€)</Label>
+                <Label className="text-sm font-semibold">Titre du poste <span className="text-destructive">*</span></Label>
                 <Input
-                  type="number"
-                  value={form.salaryMin}
-                  onChange={updateField("salaryMin")}
-                  placeholder="40000"
+                  className="h-11 rounded-xl bg-background"
+                  value={form.title}
+                  onChange={updateField("title")}
+                  placeholder="ex: Développeur Full Stack React/Node.js"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Salaire max (€)</Label>
-                <Input
-                  type="number"
-                  value={form.salaryMax}
-                  onChange={updateField("salaryMax")}
-                  placeholder="55000"
-                />
+
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Type de contrat <span className="text-destructive">*</span></Label>
+                  <Select
+                    value={form.contractType}
+                    onValueChange={(value) =>
+                      setForm((current) => ({ ...current, contractType: value }))
+                    }
+                  >
+                    <SelectTrigger className="h-11 rounded-xl bg-background">
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cdi">CDI</SelectItem>
+                      <SelectItem value="cdd">CDD</SelectItem>
+                      <SelectItem value="freelance">Freelance</SelectItem>
+                      <SelectItem value="stage">Stage</SelectItem>
+                      <SelectItem value="alternance">Alternance</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Localisation <span className="text-destructive">*</span></Label>
+                  <Input
+                    className="h-11 rounded-xl bg-background"
+                    value={form.location}
+                    onChange={updateField("location")}
+                    placeholder="ex: Paris, Hybride"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Catégorie professionnelle</Label>
+                  <Input
+                    className="h-11 rounded-xl bg-background"
+                    value={form.category}
+                    onChange={updateField("category")}
+                    placeholder="ex: Tech, Marketing, RH..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Fourchette de salaire (annuel bruts)</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      className="h-11 rounded-xl bg-background"
+                      value={form.salaryMin}
+                      onChange={updateField("salaryMin")}
+                      placeholder="Min"
+                    />
+                    <span className="text-muted-foreground">-</span>
+                    <Input
+                      type="number"
+                      className="h-11 rounded-xl bg-background"
+                      value={form.salaryMax}
+                      onChange={updateField("salaryMax")}
+                      placeholder="Max"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+          </div>
+
+          {/* Description Section */}
+          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+            <div className="border-b border-border bg-slate-50/50 p-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <AlignLeft className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-heading text-lg font-semibold text-foreground">Détails de l'offre</h3>
+                <p className="text-xs text-muted-foreground">Missions, profil et avantages</p>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-6">
               <div className="space-y-2">
-                <Label>Catégorie</Label>
-                <Input
-                  value={form.category}
-                  onChange={updateField("category")}
-                  placeholder="Tech, Design, Marketing..."
+                <div className="flex justify-between items-end">
+                  <Label className="text-sm font-semibold">Description du poste <span className="text-destructive">*</span></Label>
+                  <span className="text-xs text-muted-foreground">Soyez clair et précis</span>
+                </div>
+                <Textarea
+                  className="min-h-[160px] resize-y rounded-xl bg-background p-4"
+                  value={form.description}
+                  onChange={updateField("description")}
+                  placeholder="Décrivez les missions principales, l'équipe et le contexte du poste..."
                 />
               </div>
+
               <div className="space-y-2">
-                <Label>Compétences</Label>
+                <Label className="text-sm font-semibold">Profil recherché</Label>
+                <Textarea
+                  className="min-h-[120px] resize-y rounded-xl bg-background p-4"
+                  value={form.profileRequired}
+                  onChange={updateField("profileRequired")}
+                  placeholder="Années d'expérience, diplômes, soft skills attendues..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">Compétences clés</Label>
                 <Input
+                  className="h-11 rounded-xl bg-background"
                   value={form.skills}
                   onChange={updateField("skills")}
-                  placeholder="React, Symfony, SQL"
+                  placeholder="ex: React, Node.js, Agile (séparées par des virgules)"
+                />
+                <p className="text-xs text-muted-foreground mt-1.5">Les candidats verront ces compétences sous forme de tags.</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">Avantages</Label>
+                <Textarea
+                  className="min-h-[100px] resize-y rounded-xl bg-background p-4"
+                  value={form.benefits}
+                  onChange={updateField("benefits")}
+                  placeholder="Télétravail, Mutuelle, Tickets restaurant..."
                 />
               </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-            <h2 className="font-heading text-lg font-semibold text-foreground">
-              Description
-            </h2>
-            <div className="space-y-2">
-              <Label>Description du poste</Label>
-              <Textarea
-                rows={6}
-                value={form.description}
-                onChange={updateField("description")}
-                placeholder="Décrivez le poste, les responsabilités..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Profil recherché</Label>
-              <Textarea
-                rows={4}
-                value={form.profileRequired}
-                onChange={updateField("profileRequired")}
-                placeholder="Compétences requises, expérience..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Avantages</Label>
-              <Textarea
-                rows={3}
-                value={form.benefits}
-                onChange={updateField("benefits")}
-                placeholder="Télétravail, tickets restaurant, mutuelle..."
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Button
               type="button"
               variant="hero"
               size="lg"
-              disabled={saving}
+              className="flex-1 rounded-xl h-14 text-base"
+              disabled={saving || !form.title || !form.description}
               onClick={() => saveJob("active")}
             >
-              {saving ? "Sauvegarde..." : "Publier l'offre"}
+              {saving ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                  Publication...
+                </span>
+              ) : (
+                <>
+                  <CheckCircle2 className="mr-2 h-5 w-5" /> Publier l'offre
+                </>
+              )}
             </Button>
             <Button
               type="button"
               variant="outline"
               size="lg"
+              className="sm:w-1/3 rounded-xl h-14 bg-card hover:bg-secondary border-border"
               disabled={saving}
               onClick={() => saveJob("draft")}
             >
-              Sauvegarder brouillon
+              <Save className="mr-2 h-5 w-5 text-muted-foreground" /> Sauvegarder brouillon
             </Button>
           </div>
         </form>

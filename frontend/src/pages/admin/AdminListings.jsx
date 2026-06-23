@@ -1,7 +1,8 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Eye, Trash2, CheckCircle } from "lucide-react";
+import { Search, Eye, Trash2, CheckCircle, Filter } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const listings = [
   {
@@ -44,92 +45,103 @@ const listings = [
 const AdminListings = () => {
   return (
     <DashboardLayout role="admin" title="Gestion des offres">
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-sm flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Rechercher une offre..." className="pl-10" />
+          <Input 
+            placeholder="Rechercher une offre ou entreprise..." 
+            className="pl-10 h-10 rounded-xl bg-card border-border shadow-sm focus-visible:ring-primary/20" 
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-muted-foreground mr-1 hidden sm:inline-block">Filtrer :</span>
+          <Button variant="solid" size="sm" className="rounded-full shadow-sm">
+            Toutes
+          </Button>
+          <Button variant="outline" size="sm" className="rounded-full bg-card shadow-sm border-border">
+            En attente
+          </Button>
+          <Button variant="outline" size="sm" className="rounded-full bg-card shadow-sm border-border">
+            Actives
+          </Button>
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border bg-secondary/50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">
-                Offre
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">
-                Statut
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">
-                Candidatures
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">
-                Date
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {listings.map((l) => (
-              <tr
-                key={l.title}
-                className="hover:bg-secondary/30 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <div className="text-sm font-medium text-foreground">
-                    {l.title}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {l.company}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      l.status === "Actif"
-                        ? "bg-accent/10 text-accent"
-                        : l.status === "En attente"
-                          ? "bg-primary/10 text-primary"
-                          : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {l.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-foreground">
-                  {l.applications}
-                </td>
-                <td className="px-6 py-4 text-sm text-muted-foreground">
-                  {l.date}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Eye className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-accent"
-                    >
-                      <CheckCircle className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </td>
+      <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50/80 text-xs font-semibold uppercase text-muted-foreground border-b border-border">
+              <tr>
+                <th className="px-6 py-4">Offre</th>
+                <th className="px-6 py-4">Statut</th>
+                <th className="px-6 py-4">Candidatures</th>
+                <th className="px-6 py-4">Date</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {listings.map((l) => (
+                <tr
+                  key={l.title}
+                  className="transition-colors hover:bg-slate-50/50 group"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary font-heading font-bold text-muted-foreground border border-border">
+                        {l.company.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                          {l.title}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {l.company}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <Badge 
+                      variant={
+                        l.status === "Actif" ? "success" : 
+                        l.status === "En attente" ? "warning" : "secondary"
+                      }
+                    >
+                      {l.status}
+                    </Badge>
+                  </td>
+                  <td className="px-6 py-4 text-foreground font-medium">
+                    {l.applications}
+                  </td>
+                  <td className="px-6 py-4 text-muted-foreground">
+                    {l.date}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-600/10 rounded-lg"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </DashboardLayout>
   );
