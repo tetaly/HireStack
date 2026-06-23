@@ -8,8 +8,10 @@ import NotFound from "./pages/NotFound.jsx";
 import Login from "./pages/Login.jsx";
 import Jobs from "./pages/Jobs.jsx";
 import JobDetail from "./pages/JobDetail.jsx";
+import Categories from "./pages/Categories.jsx";
 import Companies from "./pages/Companies.jsx";
 import CompanyDetail from "./pages/CompanyDetail.jsx";
+import CareerAdvice from "./pages/CareerAdvice.jsx";
 import Register from "./pages/Register.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
@@ -39,8 +41,10 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
+          <Route path="/categories" element={<Categories />} />
           <Route path="/companies" element={<Companies />} />
           <Route path="/companies/:id" element={<CompanyDetail />} />
+          <Route path="/career-advice" element={<CareerAdvice />} />
           <Route
             path="/login"
             element={

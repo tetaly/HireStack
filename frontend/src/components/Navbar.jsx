@@ -79,10 +79,9 @@ const Navbar = () => {
         {/* Desktop */}
         <div className="hidden items-center gap-8 md:flex ml-8">
           <NavLink path="/jobs" label="Offres d'emploi" />
+          <NavLink path="/categories" label="Catégories" />
           <NavLink path="/companies" label="Entreprises" />
-          <button className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-            Conseils carrière
-          </button>
+          <NavLink path="/career-advice" label="Conseils carrière" />
         </div>
 
         <div className="hidden flex-1 md:flex" />
@@ -148,12 +147,23 @@ const Navbar = () => {
             </button>
             <button
               type="button"
+              onClick={() => goTo("/categories")}
+              className="text-left font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Catégories
+            </button>
+            <button
+              type="button"
               onClick={() => goTo("/companies")}
               className="text-left font-medium text-foreground hover:text-primary transition-colors"
             >
               Entreprises
             </button>
-            <button className="text-left font-medium text-foreground hover:text-primary transition-colors">
+            <button
+              type="button"
+              onClick={() => goTo("/career-advice")}
+              className="text-left font-medium text-foreground hover:text-primary transition-colors"
+            >
               Conseils carrière
             </button>
           </div>

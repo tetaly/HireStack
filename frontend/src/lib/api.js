@@ -70,6 +70,29 @@ export async function apiRequest(path, options = {}) {
   return body.data;
 }
 
+export async function apiBlobRequest(path, options = {}) {
+  const token = authStorage.getToken();
+  const headers = {
+    ...(options.headers ?? {}),
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error?.message ?? "Une erreur est survenue.");
+  }
+
+  return response.blob();
+}
+
 export const authApi = {
   me() {
     return apiRequest("/auth/me");
@@ -92,6 +115,17 @@ export const seekerProfileApi = {
       body: JSON.stringify(payload),
     });
   },
+  generateCv() {
+    return apiRequest("/seeker/profile/generate-cv", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  },
+  generateCvPdf() {
+    return apiBlobRequest("/seeker/profile/generate-cv.pdf", {
+      method: "POST",
+    });
+  },
 };
 
 export const jobsApi = {
@@ -107,6 +141,9 @@ export const jobsApi = {
     const query = search.toString();
 
     return apiRequest(`/jobs${query ? `?${query}` : ""}`);
+  },
+  categories() {
+    return apiRequest("/jobs/categories");
   },
   get(id) {
     return apiRequest(`/jobs/${id}`);

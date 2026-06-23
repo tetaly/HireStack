@@ -73,7 +73,7 @@ final class JobsController extends AbstractApiController
         ]);
     }
 
-    #[Route('/api/jobs/{id}', name: 'api_jobs_show', methods: ['GET'])]
+    #[Route('/api/jobs/{id}', name: 'api_jobs_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(int $id): JsonResponse
     {
         $job = $this->findJob($id);
@@ -87,6 +87,28 @@ final class JobsController extends AbstractApiController
         return $this->apiResponse([
             'job' => $this->formatJob($job, true),
             'related' => $this->getRelatedJobs($job),
+        ]);
+    }
+
+    #[Route('/api/jobs/categories', name: 'api_jobs_categories', methods: ['GET'])]
+    public function categories(): JsonResponse
+    {
+        $categories = $this->connection->fetchAllAssociative(
+            'SELECT j.category AS name, COUNT(*) AS jobs_count
+             FROM jobs j
+             WHERE j.status = "active" AND j.category IS NOT NULL AND j.category != ""
+             GROUP BY j.category
+             ORDER BY jobs_count DESC, j.category ASC',
+        );
+
+        return $this->apiResponse([
+            'categories' => array_map(
+                fn (array $category) => [
+                    'name' => $category['name'],
+                    'count' => (int) $category['jobs_count'],
+                ],
+                $categories,
+            ),
         ]);
     }
 

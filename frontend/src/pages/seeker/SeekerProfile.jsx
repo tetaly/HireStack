@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Camera, Plus, Trash2, UserCircle, Briefcase, GraduationCap, Code2, Save, Download, Globe } from "lucide-react";
+import { Camera, Plus, Trash2, UserCircle, Briefcase, GraduationCap, Code2, Save, Download, Globe, Sparkles } from "lucide-react";
 import { authStorage, seekerProfileApi } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -31,6 +31,7 @@ const SeekerProfile = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [generatingCv, setGeneratingCv] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -188,6 +189,38 @@ const SeekerProfile = () => {
     }
   };
 
+  const downloadGeneratedCv = (blob) => {
+    const filenameBase = [form.firstName, form.lastName]
+      .filter(Boolean)
+      .join("-")
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, "-") || "cv";
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `${filenameBase}-cv.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const generateCv = async () => {
+    setGeneratingCv(true);
+
+    try {
+      const pdf = await seekerProfileApi.generateCvPdf();
+
+      downloadGeneratedCv(pdf);
+      toast.success("CV PDF généré");
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setGeneratingCv(false);
+    }
+  };
+
   const handleAvatarChange = (event) => {
     const file = event.target.files?.[0];
 
@@ -274,8 +307,20 @@ const SeekerProfile = () => {
                       />
                     </label>
                   </div>
-                  <Button variant="outline" size="sm" className="rounded-lg h-9">
-                    <Download className="mr-2 h-4 w-4" /> Télécharger CV
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg h-9"
+                    disabled={generatingCv}
+                    onClick={generateCv}
+                  >
+                    {generatingCv ? (
+                      <Sparkles className="mr-2 h-4 w-4 animate-pulse" />
+                    ) : (
+                      <Download className="mr-2 h-4 w-4" />
+                    )}
+                    {generatingCv ? "Génération..." : "Générer CV IA"}
                   </Button>
                 </div>
                 
