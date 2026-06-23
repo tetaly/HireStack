@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import FooterSection from "@/components/FooterSection";
 import JobCard from "@/components/JobCard";
 import { Button } from "@/components/ui/button";
 import { Search, MapPin, Filter, ChevronLeft, ChevronRight, Check } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { jobsApi } from "@/lib/api";
 
 const types = ["Tous", "CDI", "CDD", "Stage", "Freelance"];
 const PAGE_SIZE = 12;
 
 const Jobs = () => {
-  const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
-  const [activeType, setActiveType] = useState("Tous");
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
+  const [location, setLocation] = useState(() => searchParams.get("location") ?? "");
+  const [activeType, setActiveType] = useState(() => searchParams.get("type") ?? "Tous");
   const [jobs, setJobs] = useState([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -26,6 +27,12 @@ const Jobs = () => {
   useEffect(() => {
     setPagination((current) => ({ ...current, page: 1 }));
   }, [query, location, activeType]);
+
+  useEffect(() => {
+    setQuery(searchParams.get("q") ?? "");
+    setLocation(searchParams.get("location") ?? "");
+    setActiveType(searchParams.get("type") ?? "Tous");
+  }, [searchParams]);
 
   useEffect(() => {
     let active = true;
@@ -226,7 +233,7 @@ const Jobs = () => {
                   const showGap = previous && pageNumber - previous > 1;
 
                   return (
-                    <React.Fragment key={`page-${pageNumber}`}>
+                    <Fragment key={`page-${pageNumber}`}>
                       {showGap && (
                         <span className="px-2 text-sm text-muted-foreground">
                           ...
@@ -240,7 +247,7 @@ const Jobs = () => {
                       >
                         {pageNumber}
                       </Button>
-                    </React.Fragment>
+                    </Fragment>
                   );
                 })}
 
